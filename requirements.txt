@@ -2,3 +2,6 @@ streamlit
 pandas
 matplotlib
 supabase-py
+httpx
+gotrue
+postgrest
