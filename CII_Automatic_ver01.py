@@ -50,13 +50,47 @@ elif menu == "데이터 업로드":
             xls = pd.read_excel(uploaded_file, sheet_name=None)
             st.success(f"✅ {len(xls)}개 시트 불러옴: {list(xls.keys())}")
 
-            if "monthly" in xls:
-                st.subheader("📅 월별 연료 사용량 미리보기")
-                st.dataframe(xls["monthly"].head())
-
+            # ------------ SHIPS 시트 처리 ------------
             if "ships" in xls:
+                df_ships = xls["ships"]
                 st.subheader("🚢 선박 정보 미리보기")
-                st.dataframe(xls["ships"].head())
+                st.dataframe(df_ships.head())
+
+                if st.button("🚀 ships 테이블에 저장"):
+                    try:
+                        df_clean = df_ships.where(pd.notnull(df_ships), None)
+                        data = df_clean.to_dict(orient="records")
+                        res = supabase.table("ships").insert(data).execute()
+                        st.success("✅ ships 테이블에 저장 완료!")
+                    except Exception as e:
+                        st.error(f"❌ 저장 실패: {e}")
+
+                if st.button("🚀 cii_info 테이블에 저장"):
+                    try:
+                        # 예: cii 관련 열만 추출
+                        df_cii = df_ships[["ship_name", "req_cii", "dd_date"]]  # 열 이름 정확히 확인
+                        df_cii.columns = [col.strip() for col in df_cii.columns]
+                        df_cii = df_cii.where(pd.notnull(df_cii), None)
+                        data = df_cii.to_dict(orient="records")
+                        res = supabase.table("cii_info").insert(data).execute()
+                        st.success("✅ cii_info 테이블에 저장 완료!")
+                    except Exception as e:
+                        st.error(f"❌ 저장 실패: {e}")
+
+            # ------------ MONTHLY 시트 처리 ------------
+            if "monthly" in xls:
+                df_monthly = xls["monthly"]
+                st.subheader("📅 월별 연료 사용량 미리보기")
+                st.dataframe(df_monthly.head())
+
+                if st.button("🚀 fuel_consumption_monthly 테이블에 저장"):
+                    try:
+                        df_monthly = df_monthly.where(pd.notnull(df_monthly), None)
+                        data = df_monthly.to_dict(orient="records")
+                        res = supabase.table("fuel_consumption_monthly").insert(data).execute()
+                        st.success("✅ fuel_consumption_monthly 테이블에 저장 완료!")
+                    except Exception as e:
+                        st.error(f"❌ 저장 실패: {e}")
 
         except Exception as e:
             st.error(f"❌ 엑셀 처리 중 오류: {e}")
