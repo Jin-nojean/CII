@@ -1,9 +1,4 @@
-flask==3.0.3
-streamlit>=1.33.0
-pandas>=2.2.2
-openpyxl>=3.1.2
-supabase-py>=2.1.1
-python-dotenv>=1.0.1
-httpx>=0.27.0
-postgrest>=0.10.6
-gotrue>=2.4.0
+streamlit
+pandas
+matplotlib
+supabase-py
